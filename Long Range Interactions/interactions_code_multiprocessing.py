@@ -1,43 +1,20 @@
 import pandas as pd
 import numpy as np
 import os
-from anytree import Node, RenderTree, AsciiStyle, LevelGroupOrderIter, LevelOrderGroupIter, search
-from intervaltree import Interval, IntervalTree
 import multiprocessing
 import time
+from anytree import Node, RenderTree, AsciiStyle, LevelGroupOrderIter, LevelOrderGroupIter, search
+from intervaltree import Interval, IntervalTree
+from scripts.assembly_converter import convert_assembly_hg19_to_hg38
 
 def read_dataset():
-    df_pos = pd.read_csv('df_grch38.bed', sep='\t', header=None)
-    df_pos.columns = ['chr', 'start', 'end']
-
-    orig = pd.read_csv('ICGC_TCGA_noncoding_data.csv')
-    df_pos['pos_37'] = orig['pos']
-    df_pos.drop_duplicates(keep='first', inplace=True)
-
-    df_neg = pd.read_csv('negdf_grch38.bed', sep='\t', header=None)
-    df_neg.columns = ['chr', 'start', 'end', 'old_pos', 'bed_format']
-    df_neg['chr'] = df_neg['chr'].apply(lambda x: x.replace('chr', ''))
-    df_neg['chr_old'] = df_neg['old_pos'].str.split(':').str[0].str.replace('chr', '')
-    df_neg['start_old'] = df_neg['old_pos'].str.split(':').str[1].str.split('-').str[1]
-    df_neg['end_old'] = df_neg['old_pos'].str.split(':').str[1].str.split('-').str[0]
-    df_neg['start_old'] = pd.to_numeric(df_neg['start_old'])
-    df_neg['end_old'] = pd.to_numeric(df_neg['end_old'])
-    # metadata = pd.read_csv(r'D:\Sana\ChIA-PET\Files\metadata.tsv', sep='\t')
-
-    df_pos = df_pos[['chr', 'start', 'end', 'pos_37']]
-    df_pos['driver'] = 1
-    df_pos.drop_duplicates(keep='first', inplace=True)
-
-    df_neg = df_neg[['chr', 'start', 'end', 'start_old']]
-    df_neg['driver'] = 0
-    df_neg.rename(columns = {'start_old': 'pos_37'}, inplace = True)
-    df_neg.drop_duplicates(keep='first', inplace=True)
-
-    df = pd.concat([df_pos, df_neg])
-    return df                              # final dataset including negative and positive set
+    df = pd.read_csv('../data/dataset_uncensored.csv')
+    df = convert_assembly_hg19_to_hg38(df)
+    df = df[['chr', 'start', 'end', 'start_hg19', 'driver']]
+    return df
 
 def read_file(filename, chr):
-    cp = pd.read_csv('D:/Sana/ChIA-PET/Files/' + filename, sep = '\t',  header = None)
+    cp = pd.read_csv('/ChIA-PET data/' + filename, sep = '\t',  header = None)
     cp.columns = ['chr_A', 'start_A', 'end_A', 'chr_B', 'start_B', 'end_B', 'score']
     cp['chr_A'] = cp['chr_A'].map(lambda x: x.replace('chr', ''))
     cp['chr_B'] = cp['chr_B'].map(lambda x: x.replace('chr', ''))
@@ -123,26 +100,27 @@ def worker(filename, metadata, df):
         df.at[index, chains_col] = row[chains_col] + chains
         # print("working on ", index, "with", interactions, chains)       
         # old_chr = row['chr']
-    df.to_csv('D:/Sana/ChIA-PET/Results/processed_' + filename.replace('bedpe', 'csv'), index = False)
+    df.to_csv('/Results/processed_' + filename.replace('bedpe', 'csv'), index = False)
     finish_time = time.perf_counter()
     print("Elapsed time for" + filename + " in seconds:", finish_time-start_time)
     return df
 
 if __name__ == '__main__':
     pool = multiprocessing.Pool()
-    done_files = os.listdir('D:\Sana\ChIA-PET\Results')
-    done_files = [x.replace('processed_', '').replace('csv', 'bedpe') for x in done_files]
-    all_files = os.listdir(r"D:\Sana\ChIA-PET\Files")
+    # done_files = os.listdir('/Results')
+    # done_files = [x.replace('processed_', '').replace('csv', 'bedpe') for x in done_files]
+    all_files = os.listdir('/ChIA-PET data/')
     all_files.remove('files.txt')
     all_files.remove('metadata.tsv')
-    all_files = [x for x in all_files if x not in done_files]
+    # all_files = [x for x in all_files if x not in done_files]
 
-    metadata = pd.read_csv(r'D:\Sana\ChIA-PET\Files\metadata.tsv', sep='\t')
+    metadata = pd.read_csv('/ChIA-PET data/metadata.tsv', sep='\t')
 
+    # Here we are discarding files that belong to treated samples
     files_to_keep = list(metadata[~(metadata['Biosample term name'].str.contains('positive')) & ~(metadata['Biosample term name'].str.contains('activated')) & ~(metadata['Biosample term name'].str.contains('T-cell'))]['File accession'])
     files_to_keep = [item + '.bedpe' for item in files_to_keep]
     all_files = [item for item in all_files if item in files_to_keep]
-    print("FILES LEFT: ", len(all_files))
+    # print("FILES LEFT: ", len(all_files))
     
     df = read_dataset()
     df.sort_values('chr', inplace=True)
