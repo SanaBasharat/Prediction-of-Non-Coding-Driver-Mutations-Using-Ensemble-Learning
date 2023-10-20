@@ -23,7 +23,7 @@ Department of Data Informatics,<br>
 Graduate School Of Informatics<br>
 Middle East Technical University<br>
 Ankara 06800, Türkiye<br>
-ramal.huseynov@metu.edu.tr
+sana.basharat@metu.edu.tr
 
 Ramal Hüseynov<br>
 Department of Health Informatics,<br>
