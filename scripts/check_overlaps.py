@@ -5,11 +5,11 @@ from intervaltree import Interval, IntervalTree
 
 def check_overlaps(df, df_to_check):
     for index, row in df.iterrows():
-        if row['start'] == row['end']:
+        if row['start'] >= row['end']:  # TODO change to ==
             df.at[index, 'end'] = row['start'] + 1
     
     for index, row in df_to_check.iterrows():
-        if row['start'] == row['end']:
+        if row['start'] >= row['end']:
             df_to_check.at[index, 'end'] = row['start'] + 1
 
     origdf = IntervalTree()
