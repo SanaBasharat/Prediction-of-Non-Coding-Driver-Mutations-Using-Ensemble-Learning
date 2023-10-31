@@ -6,15 +6,19 @@ import time
 from anytree import Node, RenderTree, AsciiStyle, LevelGroupOrderIter, LevelOrderGroupIter, search
 from intervaltree import Interval, IntervalTree
 from scripts.assembly_converter import convert_assembly_hg19_to_hg38
+# from ..scripts.assembly_converter import convert_assembly_hg19_to_hg38    # TODO: fix this so scripts can be called from subfolders
+# import scripts.assembly_converter as ac
 
 def read_dataset():
+    print("Reading dataset...")
     df = pd.read_csv('../data/dataset_uncensored.csv')
+    print("Converting assembly from hg19 to hg38...")
     df = convert_assembly_hg19_to_hg38(df)
-    df = df[['chr', 'start', 'end', 'start_hg19', 'driver']]
+    df = df[['chr', 'start', 'end', 'pos_37', 'driver']]
     return df
 
 def read_file(filename, chr):
-    cp = pd.read_csv('/ChIA-PET data/' + filename, sep = '\t',  header = None)
+    cp = pd.read_csv('ChIA-PET data/' + filename, sep = '\t',  header = None)
     cp.columns = ['chr_A', 'start_A', 'end_A', 'chr_B', 'start_B', 'end_B', 'score']
     cp['chr_A'] = cp['chr_A'].map(lambda x: x.replace('chr', ''))
     cp['chr_B'] = cp['chr_B'].map(lambda x: x.replace('chr', ''))
@@ -100,27 +104,27 @@ def worker(filename, metadata, df):
         df.at[index, chains_col] = row[chains_col] + chains
         # print("working on ", index, "with", interactions, chains)       
         # old_chr = row['chr']
-    df.to_csv('/Results/processed_' + filename.replace('bedpe', 'csv'), index = False)
+    df.to_csv('Results/processed_' + filename.replace('bedpe', 'csv'), index = False)
     finish_time = time.perf_counter()
     print("Elapsed time for" + filename + " in seconds:", finish_time-start_time)
     return df
 
 if __name__ == '__main__':
     pool = multiprocessing.Pool()
-    # done_files = os.listdir('/Results')
-    # done_files = [x.replace('processed_', '').replace('csv', 'bedpe') for x in done_files]
-    all_files = os.listdir('/ChIA-PET data/')
+    
+    all_files = os.listdir('ChIA-PET data/')
     all_files.remove('files.txt')
     all_files.remove('metadata.tsv')
-    # all_files = [x for x in all_files if x not in done_files]
+    done_files = os.listdir('Results')       # remove files which have already been processed and are present in Results folder
+    done_files = [x.replace('processed_', '').replace('csv', 'bedpe') for x in done_files]
+    all_files = [x for x in all_files if x not in done_files]
 
-    metadata = pd.read_csv('/ChIA-PET data/metadata.tsv', sep='\t')
+    metadata = pd.read_csv('ChIA-PET data/metadata.tsv', sep='\t')
 
     # Here we are discarding files that belong to treated samples
     files_to_keep = list(metadata[~(metadata['Biosample term name'].str.contains('positive')) & ~(metadata['Biosample term name'].str.contains('activated')) & ~(metadata['Biosample term name'].str.contains('T-cell'))]['File accession'])
     files_to_keep = [item + '.bedpe' for item in files_to_keep]
     all_files = [item for item in all_files if item in files_to_keep]
-    # print("FILES LEFT: ", len(all_files))
     
     df = read_dataset()
     df.sort_values('chr', inplace=True)
@@ -133,13 +137,16 @@ if __name__ == '__main__':
 
     jobs = []
     
-    # start_time = time.perf_counter()
+    start_time = time.perf_counter()
+    print("Files to work on:", len(all_files))
+    print("THIS MAY TAKE SOME TIME, DEPENDING ON YOUR MACHINE.")
     for file in all_files:
-    #     # worker(file, metadata, df)
+        # worker(file, metadata, df)
         print("Starting file", file)
         jobs.append(pool.apply_async(worker, args=(file, metadata, df,)))
         # print(result.get(timeout=1))
     pool.close()
     pool.join()
-    # finish_time = time.perf_counter()
-    # print("Elapsed time during the whole program in seconds:", finish_time-start_time)
+    finish_time = time.perf_counter()
+    print("Finished!")
+    print("Elapsed time during the whole program in seconds:", finish_time-start_time)
