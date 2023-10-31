@@ -1,0 +1,30 @@
+mention CV used in sweep grid search
+make bold those not default
+run using other outside mutations and showcase result in abstract that its noncoding driver due to this feature
+
+SOTA methods:
+Dr. Nod
+OncodriveFML and OncodriveCLUSTL
+see email
+check papers in CNCDatabase
+
+annotation of lncrna (from gencode)
+
+add Data availability and acknoledgements
+-----------
+
+Dr. Nod - non-coding drivers found
+Supplementary table S4
+
+may have found ref and alt with coordinates for rheinbay 2020
+supplementary table 9: Significant bins in genome-wide analysis
+supplementary note 5
+
+OncodriveCLUSTL actually is not applied to non-coding mutations
+
+Pathway and network analysis of more than 2500 whole cancer genomes
+This focuses more on genes, rather than individual mutations
+
+OncoDriveFML
+It focuses on coding and non coding driver regions rather than specific mutations
+

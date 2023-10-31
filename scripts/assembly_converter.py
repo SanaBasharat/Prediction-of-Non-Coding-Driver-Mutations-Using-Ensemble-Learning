@@ -23,3 +23,6 @@ def convert_assembly_hg19_to_hg38(df):
     df = df.drop(indices_to_drop)
     df.reset_index(inplace=True,drop=True)
     return df
+
+if __name__ == '__main__':
+    convert_assembly_hg19_to_hg38()
