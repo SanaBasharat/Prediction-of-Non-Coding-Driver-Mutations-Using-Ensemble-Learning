@@ -11,7 +11,7 @@ from scripts.assembly_converter import convert_assembly_hg19_to_hg38
 
 def read_dataset():
     print("Reading dataset...")
-    df = pd.read_csv('../data/dataset_uncensored.csv')
+    df = pd.read_csv('../data/test_data_final.csv')
     print("Converting assembly from hg19 to hg38...")
     df = convert_assembly_hg19_to_hg38(df)
     df = df[['chr', 'start', 'end', 'pos_37', 'driver']]

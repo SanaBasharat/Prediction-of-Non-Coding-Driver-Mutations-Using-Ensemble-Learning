@@ -7,7 +7,7 @@ def convert_assembly_hg19_to_hg38(df):
     This function uses the LiftOver package to convert the coordinates of a pandas dataframe from hg19 to hg38,
     while preserving the hg19 start position as a separate column
     """
-    df['start_hg19'] = df['start']
+    df['pos_37'] = df['start']
 
     lift_over = LiftOver('hg19', 'hg38')
     indices_to_drop = []

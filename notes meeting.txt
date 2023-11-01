@@ -10,7 +10,7 @@ check papers in CNCDatabase
 
 annotation of lncrna (from gencode)
 
-add Data availability and acknoledgements
+add Data availability and acknowledgements
 -----------
 
 Dr. Nod - non-coding drivers found
@@ -28,3 +28,48 @@ This focuses more on genes, rather than individual mutations
 OncoDriveFML
 It focuses on coding and non coding driver regions rather than specific mutations
 
+_______
+
+Write draft for student award
+
+have a meeting with Hilmi about how to run his code for the test data
+based on the mutation's cancer type, use the closest file
+have a list of all files
+
+TODO after workshop:
+_____
+mirna.gff from Mirbase
+it shows which mutations fall into mirna regions (that's also important)
+https://mirdb.org/index.html
+https://www.targetscan.org/vert_80/
+https://mirbase.org/download/   hsa.gff3
+
+CHECK ASSEMBLY AS WELL
+
+Use the columns that have mirna in them (mature) with 21 nucleotides
+not mirna_primary_transcript
+
+use mirna, not mirna primary
+prediction tool to see if mutation falls into a utr region that mirna binds with
+then check whether after mutation the mirna binds with it or not
+"Mature sequences have type "MiRNA""
+
+you can use mirdb as prediction database
+targetscan (see for more understanding)
+2nd to 8th nucleotide
+but if first is 'A', they are including that as well
+
+check against "reverse compliment" of mirna sequence
+non-canonical matches are possible (not all of mirna has to match)
+
+our non-coding mutations MUST suppress TP53 (our results should be this)
+
+https://genomebiology.biomedcentral.com/articles/10.1186/s13059-019-1629-z
+
+MIRDB: (see its paper as well and where we can download this data)
+if it falls into 3 utr region (black) then 1, if it falls in actual blue region, then 2
+also make use of target scores
+
+____
+try to generate a column for long non coding rna
+look for tools for this
