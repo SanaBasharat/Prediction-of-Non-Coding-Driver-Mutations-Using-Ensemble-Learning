@@ -1,5 +1,0 @@
-chr,start,end,ref,alt,region_type,reg_id,id,driver,data_source
-chr5,1295228,1295228,G,A,gc19_pc.promCore.bed,gc19_pc.promCore::gencode::TERT::ENSG00000164362.14,test0,1,Rheinbay et al 2020
-chr5,1295161,1295161,T,G,gc19_pc.promCore.bed,gc19_pc.promCore::gencode::TERT::ENSG00000164362.14,test1,1,Rheinbay et al 2020
-chr5,1295133,1295133,C,T,gc19_pc.promCore.bed,gc19_pc.promCore::gencode::TERT::ENSG00000164362.14,test2,1,Rheinbay et al 2020
-chr5,1295228,1295228,G,T,gc19_pc.promCore.bed,gc19_pc.promCore::gencode::TERT::ENSG00000164362.14,test3,1,Rheinbay et al 2020
