@@ -288,8 +288,9 @@ def vep_to_bed(vep_file):
     vep_data["chr"] = "chr" + vep_data["chr"] # adding chr format for MEME tool
     vep_data["start"] = vep_data["start"]-1 # bed format
 
-    ind = vep_data[vep_data["chr"] == "chrUn_KI270742v1"].index[0] # discard alternative chr variant
-    vep_data = vep_data.drop(index=ind).reset_index(drop=True)
+    if len(vep_data[vep_data["chr"] == "chrUn_KI270742v1"]) > 0:
+        ind = vep_data[vep_data["chr"] == "chrUn_KI270742v1"].index[0] # discard alternative chr variant
+        vep_data = vep_data.drop(index=ind).reset_index(drop=True)
 
     bed_format = pd.concat([vep_data["chr"], (vep_data["start"]-30),(vep_data["start"]+30)],axis=1) # getting -30+ sequences
     bed_format.columns = ["chr","start","end"]
@@ -361,8 +362,8 @@ def addcolumn_gain_loss(vcf_seq_path,pred_vcfs,alpha):
 
 #-------------------------------------------------------------------------------------------------------------------
 
-bed_format = vep_to_bed("final_dataset.csv") # convert bed_file
-bed_to_seq("final_dataset.csv","vep_to_bed.txt","hg19","vep_noncoding") # convert seq-info file
+bed_format = vep_to_bed("../data/dataset_uncensored.csv") # convert bed_file
+bed_to_seq("../data/dataset_uncensored.csv","vep_to_bed.txt","hg19","vep_noncoding") # convert seq-info file
 vep_seq = pd.read_csv("VEP_seq.csv") # vep file including offset sequences
 
 def main_flow(vep_seq):
