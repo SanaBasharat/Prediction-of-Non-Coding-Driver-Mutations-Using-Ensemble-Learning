@@ -9,9 +9,9 @@ from scripts.assembly_converter import convert_assembly_hg19_to_hg38
 # from ..scripts.assembly_converter import convert_assembly_hg19_to_hg38    # TODO: fix this so scripts can be called from subfolders
 # import scripts.assembly_converter as ac
 
-def read_dataset():
+def read_dataset(filename):
     print("Reading dataset...")
-    df = pd.read_csv('../data/test_data_final.csv')
+    df = pd.read_csv('../data/' + filename)
     print("Converting assembly from hg19 to hg38...")
     df = convert_assembly_hg19_to_hg38(df)
     df = df[['chr', 'start', 'end', 'pos_37', 'driver']]
@@ -112,6 +112,8 @@ def worker(filename, metadata, df):
 if __name__ == '__main__':
     pool = multiprocessing.Pool()
     
+    FILENAME = "test_data_final.csv"    # change this according to your dataset; make sure to include the file extension
+    
     all_files = os.listdir('ChIA-PET data/')
     all_files.remove('files.txt')
     all_files.remove('metadata.tsv')
@@ -126,7 +128,7 @@ if __name__ == '__main__':
     files_to_keep = [item + '.bedpe' for item in files_to_keep]
     all_files = [item for item in all_files if item in files_to_keep]
     
-    df = read_dataset()
+    df = read_dataset(FILENAME)
     df.sort_values('chr', inplace=True)
     df.reset_index(drop = True, inplace = True)
 
