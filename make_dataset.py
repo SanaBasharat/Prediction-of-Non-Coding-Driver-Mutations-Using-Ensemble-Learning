@@ -3,6 +3,10 @@ import requests
 import io
 import os
 import numpy as np
+import yaml
+
+with open("configuration.yaml", "r") as yml_file:
+    config = yaml.load(yml_file, yaml.Loader)
 
 def read_ICGC_TCGA_data():
     """
@@ -75,7 +79,7 @@ def calculate_end_coordinates(df):
     return df
 
 def repeat_masker(df):
-    rpt_masker = pd.read_pickle('artifacts/repeat_masker.pickle')
+    rpt_masker = pd.read_pickle('data/RepeatMasker/repeat_masker.pickle')
     rpt_masker = rpt_masker[['chrom', 'start', 'end', 'repClass', 'driver']] #driver
     rpt_masker = pd.concat([rpt_masker.drop('repClass', axis = 1), rpt_masker['repClass'].str.get_dummies().drop(['Low_complexity', 'Satellite', 'snRNA'], axis = 1)], axis = 1)
     rpt_masker = rpt_masker.drop_duplicates(keep='first').reset_index(drop = True)
@@ -88,7 +92,7 @@ def repeat_masker(df):
     return df
 
 def COSMIC_CGC_interactions(df):
-    gene_df = pd.read_pickle('artifacts/gencode_interactions.pickle')
+    gene_df = pd.read_pickle('data/gencode_interactions.pickle')
     gene_df.drop_duplicates(subset=['grch37_chr', 'grch37_start'], inplace = True)
     gene_df['interaction_info'] = gene_df['interaction_info'].replace('0kb', 'known_driver_gene')
     gene_df['interaction_info'] = gene_df['interaction_info'].replace('100kb downstream', 'known_driver_gene_100kb_downstream')
@@ -166,10 +170,23 @@ def long_range_interactions_results(df):
     # df = pd.read_csv('data/dataset_uncensored.csv')
 
     sum_ctcf, sum_polr2a = calculate_total_interactions(metadata)
-    combined_df = add_interactions(metadata, all_files, sum_ctcf, sum_polr2a)
+    # combined_df = add_interactions(metadata, all_files, sum_ctcf, sum_polr2a)
 
-    df = df.merge(combined_df[['chr', 'pos_37', 'driver', 'CTCF_interactions', 'CTCF_chains', 'POLR2A_interactions', 'POLR2A_chains']], left_on=['chr', 'start', 'driver'], right_on=['chr', 'pos_37', 'driver'], how='right')
+    #___________________ #TODO: remove this
+    combined_df = pd.read_csv('data/final_interactions_result.csv')
+    combined_df['CTCF_interactions'] = combined_df['CTCF_interactions']*100/sum_ctcf
+    combined_df['CTCF_chains'] = combined_df['CTCF_chains']*100/sum_ctcf
+    combined_df['POLR2A_interactions'] = combined_df['POLR2A_interactions']*100/sum_polr2a
+    combined_df['POLR2A_chains'] = combined_df['POLR2A_chains']*100/sum_polr2a
+    #_____________________
+
+    df = df.merge(combined_df[['chr', 'pos_37', 'driver', 'CTCF_interactions', 'CTCF_chains', 'POLR2A_interactions', 'POLR2A_chains']], left_on=['chr', 'start', 'driver'], right_on=['chr', 'pos_37', 'driver'], how='left')
     df.drop('pos_37', inplace=True, axis=1)
+    df.drop_duplicates(inplace=True)
+    df['CTCF_interactions'] = df['CTCF_interactions'].fillna(0)
+    df['CTCF_chains'] = df['CTCF_chains'].fillna(0)
+    df['POLR2A_interactions'] = df['POLR2A_interactions'].fillna(0)
+    df['POLR2A_chains'] = df['POLR2A_chains'].fillna(0)
     return df
 
 def create_vep_input(df, filename):
@@ -178,6 +195,7 @@ def create_vep_input(df, filename):
     df['info'] = '.'
     df['format'] = '.'
     df = df[['chr', 'start', 'id', 'ref', 'alt', 'qual', 'filter', 'info', 'format']]
+    df.sort_values(by=['chr', 'start'], inplace=True)
     header = """##fileformat=VCFv4.1
 ##FILTER=<ID=PASS,Description="All filters passed">
 ##INFO=<>
@@ -234,7 +252,7 @@ def clean_and_preprocess(df):
     cols_to_drop = []
 
     for col in df.columns:
-        if len(df[col].unique()) == 1:
+        if len(df[col].unique()) == 1 and col not in config['COLUMNS_TRAINING']:
             cols_to_drop.append(col)
 
     df.drop(cols_to_drop, axis = 1, inplace = True)
@@ -258,7 +276,7 @@ def clean_and_preprocess(df):
     COLS_TO_DROP = list(cols) + COLS_TO_DROP_INTUITION
     COLS_TO_DROP = [i for i in COLS_TO_DROP if i not in COLS_TO_KEEP]
     for col in COLS_TO_DROP:
-        if col in df.columns:
+        if col in df.columns and col not in config['COLUMNS_TRAINING']:
             df.drop(col, axis = 1, inplace = True)
 
     df = df.fillna({'STRAND': 0,
