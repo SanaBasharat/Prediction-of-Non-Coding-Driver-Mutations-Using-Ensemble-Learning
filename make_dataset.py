@@ -19,7 +19,7 @@ def read_ICGC_TCGA_data():
     tcga = pd.read_csv('data/TableS3_panorama_driver_mutations_TCGA_samples.controlled.tsv', sep='\t')  # this file is not publicly available and hence is not provided in this repository
     tcga = tcga[tcga['category'] == 'noncoding']
     tcga['data_source'] = 'TCGA'
-    df = pd.concat([icgc, tcga]).drop(['Unnamed: 12', 'Unnamed: 13', 'Unnamed: 14', 'Unnamed: 15'], axis = 1).reset_index(drop=True)
+    df = pd.concat([icgc, tcga]).drop(['Unnamed: 12', 'Unnamed: 13', 'Unnamed: 14', 'Unnamed: 15'], axis = 1, errors='ignore').reset_index(drop=True)
     df.drop_duplicates(subset=['chr', 'pos', 'ref', 'alt'], inplace = True)
     df.reset_index(drop=True, inplace=True)
     df = df[['chr', 'pos', 'ref', 'alt', 'data_source']]
@@ -78,22 +78,28 @@ def calculate_end_coordinates(df):
     print("Extraction complete!")
     return df
 
-def repeat_masker(df):
-    rpt_masker = pd.read_pickle('data/RepeatMasker/repeat_masker.pickle')
+def repeat_masker(df, mode):
+    filename = 'repeat_masker'
+    if mode == 'test':
+        filename = filename + '_test'
+    rpt_masker = pd.read_pickle('data/RepeatMasker/' + filename + '.pickle')
     rpt_masker = rpt_masker[['chrom', 'start', 'end', 'repClass', 'driver']] #driver
-    rpt_masker = pd.concat([rpt_masker.drop('repClass', axis = 1), rpt_masker['repClass'].str.get_dummies().drop(['Low_complexity', 'Satellite', 'snRNA'], axis = 1)], axis = 1)
+    rpt_masker = pd.concat([rpt_masker.drop('repClass', axis = 1), rpt_masker['repClass'].str.get_dummies().drop(['Low_complexity', 'Satellite', 'snRNA'], axis = 1, errors='ignore')], axis = 1)
     rpt_masker = rpt_masker.drop_duplicates(keep='first').reset_index(drop = True)
     rpt_masker
     df = df.merge(rpt_masker, how='left', left_on=['chr','start', 'end', 'driver'], right_on=['chrom','start', 'end', 'driver'])
-    df.drop(['chrom'], inplace=True, axis=1)
+    df.drop(['chrom'], inplace=True, axis=1, errors='ignore')
     df.fillna(0, inplace = True)
     df = df.astype({'DNA': 'int', 'LINE': 'int', 'LTR': 'int', 'SINE': 'int', 'Simple_repeat': 'int'})
     df = df.groupby(['chr', 'start', 'ref', 'alt']).max().reset_index()
     return df
 
-def COSMIC_CGC_interactions(df):
-    gene_df = pd.read_pickle('data/gencode_interactions.pickle')
-    gene_df.drop_duplicates(subset=['grch37_chr', 'grch37_start'], inplace = True)
+def COSMIC_CGC_interactions(df, mode):
+    filename = 'cosmic_overlaps'
+    if mode == 'test':
+        filename = filename + '_test'
+    gene_df = pd.read_pickle('data/COSMIC CGC data/' + filename + '.pickle')
+    gene_df.drop_duplicates(subset=['chr', 'start_hg19'], inplace = True)
     gene_df['interaction_info'] = gene_df['interaction_info'].replace('0kb', 'known_driver_gene')
     gene_df['interaction_info'] = gene_df['interaction_info'].replace('100kb downstream', 'known_driver_gene_100kb_downstream')
     gene_df['interaction_info'] = gene_df['interaction_info'].replace('100kb upstream', 'known_driver_gene_100kb_upstream')
@@ -101,13 +107,16 @@ def COSMIC_CGC_interactions(df):
     gene_df['interaction_info'] = gene_df['interaction_info'].replace('10kb upstream', 'known_driver_gene_10kb_upstream')
     gene_df['interaction_info'] = gene_df['interaction_info'].replace('2kb downstream', 'known_driver_gene_2kb_downstream')
     gene_df['interaction_info'] = gene_df['interaction_info'].replace('2kb upstream', 'known_driver_gene_2kb_upstream')
-    df = df.merge(gene_df[['grch37_chr', 'grch37_start', 'interaction_gene', 'interaction_info']], how='left', left_on=['chr', 'start'], right_on=['grch37_chr', 'grch37_start'])
-    df.drop(['grch37_chr', 'grch37_start'], inplace=True, axis=1)
-    df = pd.concat([df.drop(['interaction_gene', 'interaction_info'], axis = 1), df['interaction_info'].str.get_dummies()], axis = 1)
+    df = df.merge(gene_df[['chr', 'start_hg19', 'interaction_gene', 'interaction_info']], how='left', left_on=['chr', 'start'], right_on=['chr', 'start_hg19'])
+    df.drop(['start_hg19'], inplace=True, axis=1, errors='ignore')
+    df = pd.concat([df.drop(['interaction_gene', 'interaction_info'], axis = 1, errors='ignore'), df['interaction_info'].str.get_dummies()], axis = 1)
     return df
 
-def TF_binding_site_annotations(df):
-    tf = pd.read_csv('artifacts/vep_loss_gain_data_0.001_3o.csv')
+def TF_binding_site_annotations(df, mode):
+    filename = 'vep_loss_gain_data_0.001_3o'
+    if mode == 'test':
+        filename = filename + '_test'
+    tf = pd.read_csv('data/' + filename + '.csv')
     tf['chr'] = tf['chr'].str.replace('chr', '')
     tf['start'] = tf['start'] + 1
     df = df.merge(tf[['chr', 'start', 'ref', 'alt', 'driver', 'TF_loss', 'TF_gain', 'TF_loss_diff', 'TF_gain_diff']], how='left',
@@ -164,7 +173,7 @@ def add_interactions(metadata, all_files, sum_ctcf, sum_polr2a):
     df['POLR2A_chains'] = df['POLR2A_chains']*100/sum_polr2a
     return df
 
-def long_range_interactions_results(df):
+def long_range_interactions_results(df, mode):
     all_files = os.listdir('Long Range Interactions/Results')
     metadata = pd.read_csv('Long Range Interactions/ChIA-PET data/metadata.tsv', sep='\t')
     # df = pd.read_csv('data/dataset_uncensored.csv')
@@ -173,15 +182,18 @@ def long_range_interactions_results(df):
     # combined_df = add_interactions(metadata, all_files, sum_ctcf, sum_polr2a)
 
     #___________________ #TODO: remove this
-    combined_df = pd.read_csv('data/final_interactions_result.csv')
+    filename = 'final_interactions_result'
+    if mode == 'test':
+        filename = filename + '_test'
+    combined_df = pd.read_csv('data/' + filename + '.csv')
     combined_df['CTCF_interactions'] = combined_df['CTCF_interactions']*100/sum_ctcf
     combined_df['CTCF_chains'] = combined_df['CTCF_chains']*100/sum_ctcf
     combined_df['POLR2A_interactions'] = combined_df['POLR2A_interactions']*100/sum_polr2a
     combined_df['POLR2A_chains'] = combined_df['POLR2A_chains']*100/sum_polr2a
     #_____________________
-
+    
     df = df.merge(combined_df[['chr', 'pos_37', 'driver', 'CTCF_interactions', 'CTCF_chains', 'POLR2A_interactions', 'POLR2A_chains']], left_on=['chr', 'start', 'driver'], right_on=['chr', 'pos_37', 'driver'], how='left')
-    df.drop('pos_37', inplace=True, axis=1)
+    df.drop('pos_37', inplace=True, axis=1, errors='ignore')
     df.drop_duplicates(inplace=True)
     df['CTCF_interactions'] = df['CTCF_interactions'].fillna(0)
     df['CTCF_chains'] = df['CTCF_chains'].fillna(0)
@@ -255,7 +267,7 @@ def clean_and_preprocess(df):
         if len(df[col].unique()) == 1 and col not in config['COLUMNS_TRAINING']:
             cols_to_drop.append(col)
 
-    df.drop(cols_to_drop, axis = 1, inplace = True)
+    df.drop(cols_to_drop, axis = 1, inplace = True, errors='ignore')
 
     df.replace('-', np.nan, inplace = True)
 
@@ -277,7 +289,7 @@ def clean_and_preprocess(df):
     COLS_TO_DROP = [i for i in COLS_TO_DROP if i not in COLS_TO_KEEP]
     for col in COLS_TO_DROP:
         if col in df.columns and col not in config['COLUMNS_TRAINING']:
-            df.drop(col, axis = 1, inplace = True)
+            df.drop(col, axis = 1, inplace = True, errors='ignore')
 
     df = df.fillna({'STRAND': 0,
                          'ada_score': 0, 'rf_score': 0,
@@ -296,7 +308,7 @@ def clean_and_preprocess(df):
     df['Allele'] = df['Allele'].fillna('-')
     df['SYMBOL'] = df.groupby('#Uploaded_variation').SYMBOL.transform('first') # to fill in the null SYMBOLs for some variants
     
-    df_dummies = pd.concat([df.drop(['Consequence', 'IMPACT', 'Feature_type', 'BIOTYPE'], axis = 1, inplace = False),
+    df_dummies = pd.concat([df.drop(['Consequence', 'IMPACT', 'Feature_type', 'BIOTYPE'], axis = 1, inplace = False, errors='ignore'),
                     df['Consequence'].str.get_dummies(sep=","),
                     df['IMPACT'].str.get_dummies(),
                     df['Feature_type'].str.get_dummies(),

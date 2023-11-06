@@ -5,9 +5,14 @@ import multiprocessing
 import time
 from anytree import Node, RenderTree, AsciiStyle, LevelGroupOrderIter, LevelOrderGroupIter, search
 from intervaltree import Interval, IntervalTree
-from scripts.assembly_converter import convert_assembly_hg19_to_hg38
-# from ..scripts.assembly_converter import convert_assembly_hg19_to_hg38    # TODO: fix this so scripts can be called from subfolders
-# import scripts.assembly_converter as ac
+import sys
+import yaml
+
+with open("../configuration.yaml", "r") as yml_file:
+    config = yaml.load(yml_file, yaml.Loader)
+
+sys.path.insert(1, config['SCRIPTS_FOLDER'])
+from assembly_converter import convert_assembly_hg19_to_hg38
 
 def read_dataset(filename):
     print("Reading dataset...")
