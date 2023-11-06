@@ -26,7 +26,7 @@ def post_processing(res, df):
     df_flat.columns = df_flat.columns.str.replace("rmsk.", "")
     df_flat = df_flat.drop_duplicates(keep='first')
     df_flat.reset_index(inplace = True, drop = True)
-    df_flat.drop(['id', 'end'], inplace=True, axis=1)
+    df_flat.drop(['id', 'end'], inplace=True, axis=1, errors='ignore')
     df_merge = pd.merge(df, df_flat, how='left', left_on=['chr', 'start'], right_on=['chrom', 'start'])
     df_merge = df_merge[~df_merge['chrom'].isna()].reset_index(drop=True,inplace=False)
     # df_merge['start'] = df_merge['start'].apply(lambda x: x+1)
