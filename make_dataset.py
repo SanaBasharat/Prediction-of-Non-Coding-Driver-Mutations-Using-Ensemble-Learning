@@ -201,7 +201,47 @@ def long_range_interactions_results(df, mode):
     df['POLR2A_chains'] = df['POLR2A_chains'].fillna(0)
     return df
 
+def convert_to_vcf(df):
+    # df['end'] = 0
+    for index, row in df.iterrows():
+        start_pos = row['start']
+        ref = row['ref']
+        alt = row['alt']
+        if row['ref'] != '-' and row['alt'] != '-':
+            # df.at[index, 'end'] = start_pos
+            pass
+        elif row['ref'] == '-':                 # insertion
+            url = """https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom={};start={};end={}""".format(row['chr'], start_pos - 1 , start_pos)
+            # print(url)          # this API is 0 based, while my dataset is 1 based
+            response = requests.get(url)
+            seq = response.json()
+            df.at[index, 'end'] = start_pos
+            df.at[index, 'start'] = start_pos + 1
+            df.at[index, 'ref'] = seq['dna']
+            df.at[index, 'alt'] = seq['dna'] + alt
+        elif row['alt'] == '-':                 # deletion
+            url = """https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom={};start={};end={}""".format(row['chr'], start_pos - 1 - 1 , start_pos - 1)
+            # print(url)          # this API is 0 based, while my dataset is 1 based
+            response = requests.get(url)
+            seq = response.json()
+            # print(index, row['chr'], row['start'], row['ref'], row['alt'])
+            # print(seq['dna'])
+            df.at[index, 'start'] = start_pos - 1
+            df.at[index, 'end'] = start_pos
+            df.at[index, 'ref'] = seq['dna'].capitalize() + ref
+            df.at[index, 'alt'] = seq['dna'].capitalize()
+    return df
+
 def create_vep_input(df, filename):
+    if len(df[df['ref'] == '-']) > 0 or len(df[df['alt'] == '-']) > 0:
+        print("File format detected that is other than VCF. Converting " + len(df[df['ref'] == '-']) > 0 or len(df[df['alt'] == '-']) + " records to VCF now...")
+        print("This may take some time...")
+        df_fix = df[(df['ref'] == '-') | (df['alt'] == '-')]
+        ind_delete = df_fix.index
+        df.drop(ind_delete, inplace=True)
+        df_conv = convert_to_vcf(df_fix)
+        df = pd.concat([df, df_conv])
+        df.reset_index(drop=True, inplace=True)
     df['qual'] = '.'
     df['filter'] = '.'
     df['info'] = '.'
