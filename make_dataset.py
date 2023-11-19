@@ -186,10 +186,10 @@ def long_range_interactions_results(df, mode):
     if mode == 'test':
         filename = filename + '_test'
     combined_df = pd.read_csv('data/' + filename + '.csv')
-    combined_df['CTCF_interactions'] = combined_df['CTCF_interactions']*100/sum_ctcf
-    combined_df['CTCF_chains'] = combined_df['CTCF_chains']*100/sum_ctcf
-    combined_df['POLR2A_interactions'] = combined_df['POLR2A_interactions']*100/sum_polr2a
-    combined_df['POLR2A_chains'] = combined_df['POLR2A_chains']*100/sum_polr2a
+    combined_df['CTCF_interactions'] = combined_df['CTCF_interactions']*1000/sum_ctcf
+    combined_df['CTCF_chains'] = combined_df['CTCF_chains']*1000/sum_ctcf
+    combined_df['POLR2A_interactions'] = combined_df['POLR2A_interactions']*1000/sum_polr2a
+    combined_df['POLR2A_chains'] = combined_df['POLR2A_chains']*1000/sum_polr2a
     #_____________________
     
     df = df.merge(combined_df[['chr', 'pos_37', 'driver', 'CTCF_interactions', 'CTCF_chains', 'POLR2A_interactions', 'POLR2A_chains']], left_on=['chr', 'start', 'driver'], right_on=['chr', 'pos_37', 'driver'], how='left')
