@@ -1,5 +1,5 @@
-BASE_DIR: 'D:\Masters Thesis\GitHub Repo\'
-SCRIPTS_FOLDER: 'D:\Masters Thesis\GitHub Repo\scripts'
+BASE_DIR: 'path-to-repo\'
+SCRIPTS_FOLDER: 'path-to-repo\scripts'
 MODE: 'test'
 COLUMNS_TRAINING : ['ada_score', 'rf_score',
                     'ENSP', 'UNIPARC', 'GO',
@@ -27,4 +27,4 @@ COLUMNS_TRAINING : ['ada_score', 'rf_score',
                     'missense_variant', 'synonymous_variant', 'stop_gained', 'stop_lost', 'splice_region_variant', 'inframe_insertion', 'frameshift_variant',
                     'TF_loss_add', 'TF_gain_add', 'TF_loss_diff_add', 'TF_gain_diff_add'
                   ]
-WANDB_API_KEY: '8760ac6e727d4e8b826bb6a5fd5bdf3e2d662a40'
+WANDB_API_KEY: '####'
