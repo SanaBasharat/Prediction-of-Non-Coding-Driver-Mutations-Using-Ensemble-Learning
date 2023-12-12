@@ -4,6 +4,8 @@ data/TableS3_panorama_driver_mutations_TCGA_samples.controlled.tsv
 # Controlled access. You need to register for an account first at: https://cancer.sanger.ac.uk/cosmic/register
 data/Cosmic_NonCodingVariants_Vcf_v98_GRCh37
 
+data/final_dataset.csv
+
 Long Range Interactions/ChIA-PET data/*
 Long Range Interactions/Results/*
 
