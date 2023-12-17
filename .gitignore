@@ -1,8 +1,16 @@
 # Controlled access. You need to apply for access through dbGaP. For more information, go to: https://dcc.icgc.org/releases/PCAWG/driver_mutations
 data/TableS3_panorama_driver_mutations_TCGA_samples.controlled.tsv
+data/TableS3_panorama_driver_mutations_ICGC_samples.controlled.tsv
 
 # Controlled access. You need to register for an account first at: https://cancer.sanger.ac.uk/cosmic/register
 data/Cosmic_NonCodingVariants_Vcf_v98_GRCh37
+
+data/final_dataset.csv
+data/final_interactions_result.csv
+data/vep_loss_gain_data_0.001_3o.csv
+data/all_data.csv
+data/all_data_hg38.csv
+data/dataset_uncensored.csv
 
 Long Range Interactions/ChIA-PET data/*
 Long Range Interactions/Results/*
