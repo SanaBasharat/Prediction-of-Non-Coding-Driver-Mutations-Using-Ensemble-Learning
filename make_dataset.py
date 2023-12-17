@@ -37,7 +37,7 @@ def read_COSMIC_data():
     Using BCFTools in a WSL-2 environment, 599 mutations were randomly selected and saved as a VCF file called negative_samples.vcf.
     These mutations were fisrt confirmed to not overlap with our positive set, and then made to be used as our negative set.
     """
-    df = pd.read_csv('data/negative_samples.vcf', sep='\t', header=None)
+    df = pd.read_csv('data/nondriver_noncoding_mutations.vcf', sep='\t', header=None) #negative_samples.vcf
     df.columns=['chr', 'start', 'ref', 'alt']
     df['data_source'] = 'COSMIC'
     df = df[['chr', 'start', 'ref', 'alt', 'data_source']]
