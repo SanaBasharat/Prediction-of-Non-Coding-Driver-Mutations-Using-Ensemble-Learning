@@ -17,6 +17,7 @@ data/VEP/vep_output.txt
 
 Long Range Interactions/ChIA-PET data/*
 Long Range Interactions/Results/*
+Long Range Interactions/Results Train Set/*
 
 data/Rheinbay 2020
 data/gene-coding-and-non-coding-elements
