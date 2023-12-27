@@ -16,9 +16,10 @@ from assembly_converter import convert_assembly_hg19_to_hg38
 def read_dataset(filename):
     print("Reading dataset...")
     df = pd.read_csv('../data/' + filename)
-    print("Converting assembly from hg19 to hg38...")
-    df = convert_assembly_hg19_to_hg38(df)
-    df = df[['chr', 'start', 'end', 'pos_37', 'driver']]
+    # print("Converting assembly from hg19 to hg38...")
+    # df = convert_assembly_hg19_to_hg38(df)
+    df = df[['chr', 'start', 'end', 'start_hg19', 'driver']]
+    df = df[:5]
     return df
 
 def read_files(filename):
@@ -164,7 +165,7 @@ def worker(filename, metadata, mutation_df):
 if __name__ == '__main__':
     pool = multiprocessing.Pool(processes=os.cpu_count())
     
-    FILENAME = "test_data_final.csv"    # change this according to your dataset; make sure to include the file extension
+    FILENAME = 'all_data_hg38.csv'#"test_data_final.csv"    # change this according to your dataset; make sure to include the file extension
     
     all_files = os.listdir('ChIA-PET data/')
     all_files.remove('files.txt')

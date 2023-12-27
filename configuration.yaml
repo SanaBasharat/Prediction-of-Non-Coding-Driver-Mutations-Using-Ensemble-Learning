@@ -1,10 +1,5 @@
-<<<<<<< HEAD
-BASE_DIR: 'path-to-repo\'
-SCRIPTS_FOLDER: 'path-to-repo\scripts'
-=======
-BASE_DIR: 'D:\Masters Thesis\GitHub Repo\' #'path-to-repo\'
-SCRIPTS_FOLDER: 'D:\Masters Thesis\GitHub Repo\scripts' #'path-to-repo\scripts'
->>>>>>> 20b5a7949d5c17dd100870e664e8791a654808bb
+BASE_DIR: 'D:\Sana\Prediction-of-Non-Coding-Driver-Mutations-Using-Ensemble-Learning\'
+SCRIPTS_FOLDER: 'D:\Sana\Prediction-of-Non-Coding-Driver-Mutations-Using-Ensemble-Learning\scripts'
 MODE: 'test'
 COLUMNS_TRAINING : ['ada_score', 'rf_score',
                     'ENSP', 'UNIPARC', 'GO',
