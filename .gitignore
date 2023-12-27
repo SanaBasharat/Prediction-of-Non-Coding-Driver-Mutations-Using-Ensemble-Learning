@@ -11,9 +11,15 @@ data/vep_loss_gain_data_0.001_3o.csv
 data/all_data.csv
 data/all_data_hg38.csv
 data/dataset_uncensored.csv
+data/lncrna.csv
+data/RepeatMasker/repeat_masker.pickle
+data/VEP/vep_output.txt
 
 Long Range Interactions/ChIA-PET data/*
 Long Range Interactions/Results/*
 
 data/Rheinbay 2020
 data/gene-coding-and-non-coding-elements
+
+__pycache__
+scripts/__pycache__
