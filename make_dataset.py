@@ -234,7 +234,7 @@ def convert_to_vcf(df):
 
 def create_vep_input(df, filename):
     if len(df[df['ref'] == '-']) > 0 or len(df[df['alt'] == '-']) > 0:
-        print("File format detected that is other than VCF. Converting " + len(df[df['ref'] == '-']) > 0 or len(df[df['alt'] == '-']) + " records to VCF now...")
+        print("File format detected that is other than VCF. Converting " + str(len(df[(df['ref'] == '-') | (df['alt'] == '-')])) + " records to VCF now...")
         print("This may take some time...")
         df_fix = df[(df['ref'] == '-') | (df['alt'] == '-')]
         ind_delete = df_fix.index

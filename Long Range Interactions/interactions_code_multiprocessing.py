@@ -181,6 +181,8 @@ if __name__ == '__main__':
     files_to_keep = [item + '.bedpe' for item in files_to_keep]
     all_files = [item for item in all_files if item in files_to_keep]
     
+    all_files = ['ENCFF110LPZ.bedpe']
+    
     df = read_dataset(FILENAME)
     df.sort_values('chr', inplace=True)
     df.reset_index(drop = True, inplace = True)
