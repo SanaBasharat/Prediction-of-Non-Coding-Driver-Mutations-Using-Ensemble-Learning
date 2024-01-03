@@ -5,6 +5,7 @@ data/TableS3_panorama_driver_mutations_ICGC_samples.controlled.tsv
 # Controlled access. You need to register for an account first at: https://cancer.sanger.ac.uk/cosmic/register
 data/Cosmic_NonCodingVariants_Vcf_v98_GRCh37
 
+# Data files
 data/final_dataset.csv
 data/final_interactions_result.csv
 data/vep_loss_gain_data_0.001_3o.csv
@@ -14,6 +15,7 @@ data/dataset_uncensored.csv
 data/lncrna.csv
 data/RepeatMasker/repeat_masker.pickle
 data/VEP/vep_output.txt
+data/extracted_data.csv
 
 Long Range Interactions/ChIA-PET data/*
 Long Range Interactions/Results/*
@@ -23,4 +25,5 @@ data/Rheinbay 2020
 data/gene-coding-and-non-coding-elements
 
 __pycache__
-scripts/__pycache__
+
+lncRNA/lncrna.ipynb

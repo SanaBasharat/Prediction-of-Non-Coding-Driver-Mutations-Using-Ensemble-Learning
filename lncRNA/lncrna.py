@@ -5,22 +5,23 @@ from anytree import Node, LevelOrderGroupIter
 from intervaltree import Interval, IntervalTree
 import yaml
 import sys
+import time
 
-with open("../configuration.yaml", "r") as yml_file:
+with open("./configuration.yaml", "r") as yml_file:
     config = yaml.load(yml_file, yaml.Loader)
 
 sys.path.insert(1, config['SCRIPTS_FOLDER'])
 from assembly_converter import convert_assembly_hg19_to_hg38
 
 def read_data():
-    df = pd.read_csv('../data/dataset_uncensored.csv')
-    tst = pd.read_csv('../data/test_data_final.csv')
+    df = pd.read_csv('./data/dataset_uncensored.csv')
+    tst = pd.read_csv('./data/test_data_final.csv')
     tst = tst[['id', 'chr', 'start', 'end', 'ref', 'alt', 'driver', 'data_source']]
     df = pd.concat([df, tst]).reset_index(drop=True)
     return df
 
 def read_lncrna_data():
-    lncdf = pd.read_csv("../data/lncRNA/lncipedia_5_2_hg19.bed", sep="\t", header = None)
+    lncdf = pd.read_csv("./data/lncRNA/lncipedia_5_2_hg19.bed", sep="\t", header = None)
     lncdf.columns = ['chrom', 'chromStart', 'chromEnd', 'name', 'score', 'strand', 'thickStart', 'thickEnd', 'itemRgb', 'blockCount', 'blockSizes', 'blockStarts']
     lncdf.rename({'chrom': 'chr', 'chromStart': 'start', 'chromEnd': 'end'}, inplace=True, axis=1)
     lncdf['chr'] = lncdf['chr'].apply(lambda x: x.replace('chr', ''))
@@ -32,15 +33,15 @@ def find_overlaps(df, lncdf):
     lnc_tree = IntervalTree()
 
     for index, row in lncdf.iterrows():
-        lnc_tree.add(Interval(row['start'], row['end'], (row['chr'], row['name'], '0kb')))
+        lnc_tree.add(Interval(row['start'], row['end'], (row['chr'], row['name'], 'known_lncrna')))
 
-        lnc_tree.add(Interval(row['start']-2000, row['start'], (row['chr'], row['name'], '2kb upstream')))
-        lnc_tree.add(Interval(row['start']-10000, row['start']-2000, (row['chr'], row['name'], '10kb upstream')))
-        lnc_tree.add(Interval(row['start']-100000, row['start']-10000, (row['chr'], row['name'], '100kb upstream')))
+        lnc_tree.add(Interval(row['start']-2000, row['start'], (row['chr'], row['name'], 'known_lncrna_2kb_upstream')))
+        lnc_tree.add(Interval(row['start']-10000, row['start']-2000, (row['chr'], row['name'], 'known_lncrna_10kb_upstream')))
+        lnc_tree.add(Interval(row['start']-100000, row['start']-10000, (row['chr'], row['name'], 'known_lncrna_100kb_upstream')))
 
-        lnc_tree.add(Interval(row['end'], row['end']+2000, (row['chr'], row['name'], '2kb downstream')))
-        lnc_tree.add(Interval(row['end']+2000, row['end']+10000, (row['chr'], row['name'], '10kb downstream')))
-        lnc_tree.add(Interval(row['end']+10000, row['end']+100000, (row['chr'], row['name'], '100kb downstream')))
+        lnc_tree.add(Interval(row['end'], row['end']+2000, (row['chr'], row['name'], 'known_lncrna_2kb_downstream')))
+        lnc_tree.add(Interval(row['end']+2000, row['end']+10000, (row['chr'], row['name'], 'known_lncrna_10kb_downstream')))
+        lnc_tree.add(Interval(row['end']+10000, row['end']+100000, (row['chr'], row['name'], 'known_lncrna_100kb_downstream')))
 
     df_tree = []
 
@@ -67,9 +68,17 @@ def find_overlaps(df, lncdf):
                 df.at[index, 'overlap_info'] = found_interaction[2]
     return df
 
-def main():
-    RESULT_FILENAME = 'lncrna_overlaps'
-    df = read_data()
+def find_lncrna_overlaps(df):
+    start_time = time.perf_counter()
+    print("Finding overlaps with lncRNA...")
     lncdf = read_lncrna_data()
     df = find_overlaps(df, lncdf)
-    df.to_pickle('../data/lncRNA/' + RESULT_FILENAME + '.pickle')
+    df.drop(['overlaps'], inplace=True, axis=1, errors='ignore')
+    df = pd.concat([df.drop(['overlap_lncrna', 'overlap_info'], axis = 1, errors='ignore'), df['overlap_info'].str.get_dummies()], axis = 1)
+    cols = ['known_lncrna', 'known_lncrna_100kb_downstream', 'known_lncrna_100kb_upstream', 'known_lncrna_10kb_downstream',
+            'known_lncrna_10kb_upstream', 'known_lncrna_2kb_downstream', 'known_lncrna_2kb_upstream']
+    df = df.reindex(df.columns.union(cols, sort=False), axis=1, fill_value=0)
+    finish_time = time.perf_counter()
+    print("Completed in ", finish_time-start_time,"seconds.")
+    print("\n")
+    return df

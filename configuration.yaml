@@ -1,5 +1,5 @@
-BASE_DIR: 'D:\Sana\Prediction-of-Non-Coding-Driver-Mutations-Using-Ensemble-Learning\'
-SCRIPTS_FOLDER: 'D:\Sana\Prediction-of-Non-Coding-Driver-Mutations-Using-Ensemble-Learning\scripts'
+BASE_DIR: 'D:\Masters Thesis\GitHub Repo\'
+SCRIPTS_FOLDER: 'D:\Masters Thesis\GitHub Repo\scripts'
 MODE: 'test'
 COLUMNS_TRAINING : ['ada_score', 'rf_score',
                     'ENSP', 'UNIPARC', 'GO',
@@ -25,6 +25,8 @@ COLUMNS_TRAINING : ['ada_score', 'rf_score',
                     'known_driver_gene_10kb_upstream', 'known_driver_gene_2kb_downstream', 'known_driver_gene_2kb_upstream',
                     'splice_acceptor_variant', 'splice_donor_region_variant', 'splice_donor_5th_base_variant',
                     'missense_variant', 'synonymous_variant', 'stop_gained', 'stop_lost', 'splice_region_variant', 'inframe_insertion', 'frameshift_variant',
-                    'TF_loss_add', 'TF_gain_add', 'TF_loss_diff_add', 'TF_gain_diff_add'
+                    'TF_loss_add', 'TF_gain_add', 'TF_loss_diff_add', 'TF_gain_diff_add',
+                    'known_lncrna', 'known_lncrna_100kb_downstream', 'known_lncrna_100kb_upstream', 'known_lncrna_10kb_downstream',
+                    'known_lncrna_10kb_upstream', 'known_lncrna_2kb_downstream', 'known_lncrna_2kb_upstream'
                   ]
 WANDB_API_KEY: '####'
