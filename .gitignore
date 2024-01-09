@@ -27,4 +27,5 @@ data/gene-coding-and-non-coding-elements
 __pycache__
 
 lncRNA/lncrna.ipynb
-data/genome_assembly/*.fa
+
+data/genome_assembly/*.fa.gz
