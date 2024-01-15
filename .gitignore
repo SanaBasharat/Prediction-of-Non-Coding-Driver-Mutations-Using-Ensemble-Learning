@@ -20,6 +20,7 @@ data/extracted_data.csv
 Long Range Interactions/ChIA-PET data/*
 Long Range Interactions/Results/*
 Long Range Interactions/Results Train Set/*
+Long Range Interactions/Results Test Set/*
 Long Range Interactions/Results - Old Method
 
 data/Rheinbay 2020
