@@ -20,7 +20,7 @@ def read_dataset(filename):
     # print("Converting assembly from hg19 to hg38...")
     # df = convert_assembly_hg19_to_hg38(df)
     df = df[['chr', 'start', 'end', 'start_hg19', 'driver']]
-    df = df[:5]
+    # df = df[:5]
     return df
 
 def read_files(filename):
@@ -198,7 +198,7 @@ if __name__ == '__main__':
     files_to_keep = [item + '.bedpe' for item in files_to_keep]
     all_files = [item for item in all_files if item in files_to_keep]
     
-    all_files = ['ENCFF110LPZ.bedpe']
+    # all_files = ['ENCFF110LPZ.bedpe']
     
     saved_trees = os.listdir('Saved/Trees/')
     saved_arrays = os.listdir('Saved/Arrays/')
