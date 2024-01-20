@@ -6,6 +6,7 @@ import time
 from intervaltree import Interval, IntervalTree
 import sys
 import yaml
+import pickle
 
 with open("../configuration.yaml", "r") as yml_file:
     config = yaml.load(yml_file, yaml.Loader)
@@ -29,7 +30,6 @@ def read_files(filename):
             usecols=["CHR1", "start1", "end1", "CHR2", "start2", "end2", "p2"], 
             header=None, dtype=\
             {0: object, 1: int, 2: int, 3: object, 4: int, 5: int, 6: int})
-    
     return interactions
 
 
@@ -132,28 +132,44 @@ def reducer(old, new):
     return old.union(new)
 
 
-def worker(filename, metadata, mutation_df):
+def worker(filename, metadata, mutation_df, saved_trees, saved_arrays):
     print("Entered file", filename)
     filename = filename.replace(".bedpe", "")
     biotype = metadata[metadata["File accession"] == filename]["Experiment target"].values[0].\
             replace("-human", "") + "_interactions"
     # read bedpe file as interactions
     interactions = read_files(filename)
-    
     for chromosome in np.intersect1d(interactions["CHR1"], "chr" + mutation_df["chr"]):
         print(chromosome)
-        # filter interactions dataframe to interactions array
-        filtered_interactions, indexStop = filter_bedpe_file(interactions, chromosome)
-        
-        # create IntervalTree
-        tree = create_tree(filtered_interactions)
-        # SAVE THIS TREE AS WELL
-        # merge intervals which overlaps directly (not same as merge_overlaps())
-        m_tree = merge_direct_overlaps(tree.copy(), data_reducer=reducer)
-        
-        # convert tree to array
-        array = tree_to_array(m_tree, indexStop)
-        # THIS IS WHERE WE STORE THE TREE, but add chr to the name as well
+        if 'tree_'+chromosome+'_'+filename+'.pkl' not in saved_trees:
+            print("Tree not found for " + chromosome + " for file " + filename)
+            # filter interactions dataframe to interactions array
+            filtered_interactions, indexStop = filter_bedpe_file(interactions, chromosome)
+            
+            # create IntervalTree
+            tree = create_tree(filtered_interactions)
+            # SAVE THIS TREE AS WELL
+            with open('Saved/Trees/tree_'+chromosome+'_'+filename+'.pkl','wb') as f:
+                pickle.dump(tree, f)
+        else:
+            print("Loaded tree for " + chromosome + " for file " + filename)
+            with open('Saved/Trees/tree_'+chromosome+'_'+filename+'.pkl','rb') as f:
+                tree = pickle.load(f)
+
+        if 'array_'+chromosome+'_'+filename+'.pkl' not in saved_arrays:
+            print("Array not found for " + chromosome + " for file " + filename)
+            # merge intervals which overlaps directly (not same as merge_overlaps())
+            m_tree = merge_direct_overlaps(tree.copy(), data_reducer=reducer)
+            # convert tree to array
+            array = tree_to_array(m_tree, indexStop)
+            # THIS IS WHERE WE STORE THE TREE, but add chr to the name as well
+            with open('Saved/Arrays/array_'+chromosome+'_'+filename+'.pkl','wb') as f:
+                pickle.dump(array, f)
+        else:
+            print("Loaded array for " + chromosome + " for file " + filename)
+            with open('Saved/Arrays/array_'+chromosome+'_'+filename+'.pkl','rb') as f:
+                array = pickle.load(f)
+
         for mutation in mutation_df[ mutation_df["chr"] == chromosome[3:] ]["start"]:
             interaction_number = build_tree(array, tree.at(mutation))
             if interaction_number > 0:
@@ -184,6 +200,9 @@ if __name__ == '__main__':
     
     all_files = ['ENCFF110LPZ.bedpe']
     
+    saved_trees = os.listdir('Saved/Trees/')
+    saved_arrays = os.listdir('Saved/Arrays/')
+
     df = read_dataset(FILENAME)
     df.sort_values('chr', inplace=True)
     df.reset_index(drop = True, inplace = True)
@@ -199,7 +218,7 @@ if __name__ == '__main__':
     for file in all_files:
         # worker(file, metadata, df)
         print("Starting file", file)
-        jobs.append(pool.apply_async(worker, args=(file, metadata, df.copy(),)))
+        jobs.append(pool.apply_async(worker, args=(file, metadata, df.copy(), saved_trees, saved_arrays,)))
         # print(result.get(timeout=1))
     pool.close()
     pool.join()
