@@ -45,3 +45,4 @@ data/genome_assembly/*.fa.gz.fxi
 scripts/vep_api_output.pkl
 
 TF-binding Effect Prediction/TF_outputs/results/*
+TF_binding_Effect_Prediction/TF_outputs
