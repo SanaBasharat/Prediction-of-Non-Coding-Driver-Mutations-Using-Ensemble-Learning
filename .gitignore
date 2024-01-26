@@ -20,6 +20,7 @@ data/VEP/vep_output.csv
 data/extracted_data.csv
 data/VEP/vep_api_output.csv
 data/VEP/vep_api_output.pkl
+data/ICGC_TCGA_noncoding_data.csv
 
 Long Range Interactions/ChIA-PET data/*
 Long Range Interactions/Results/*
@@ -44,4 +45,14 @@ data/genome_assembly/*.fa.gz.fxi
 
 scripts/vep_api_output.pkl
 
-TF-binding Effect Prediction/TF_outputs/results/*
+TF-binding_Effect_Prediction/TF_outputs/TFcombined_results/*
+TF-binding_Effect_Prediction/TF_outputs/vep_to_bed.txt
+TF_binding_Effect_Prediction/TF_outputs/VEP_seq.csv
+TF_binding_Effect_Prediction/TF_outputs/vep_noncoding_fasta.txt
+TF_binding_Effect_Prediction/TF_outputs/vep_to_bed.txt
+__pycache__/*
+TF_binding_Effect_Prediction/TF_outputs/TFcombined_results/vep_loss_gain_data_0.0001.csv
+TF_binding_Effect_Prediction/TF_outputs/TFcombined_results/vep_loss_gain_data_0.001.csv
+TF_binding_Effect_Prediction/TF_outputs/TFcombined_results/vep_loss_gain_data_0.01.csv
+TF_binding_Effect_Prediction/TF_outputs/TFcombined_results/vep_loss_gain_data_0.05.csv
+TF_binding_Effect_Prediction/TF_outputs/TFcombined_results/vep_loss_gain_data_1e-05.csv
