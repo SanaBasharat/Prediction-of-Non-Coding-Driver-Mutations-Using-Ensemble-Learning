@@ -64,6 +64,7 @@ def addcolumn_gain_loss(pred_vcfs,alpha): # Aggregate all TF-models
         pred_sgd.reset_index(inplace=True)
         pred_sgd.apply(gain_or_loss,alpha=alpha,axis=1)
     vep_seq.to_csv(f"TF_binding_Effect_Prediction/TF_outputs/TFcombined_results/vep_loss_gain_data_{alpha}.csv",index=False)
+    return vep_seq
 def process_vep(param, ENCODE_ID, TF_name, vep_seq):
     start = time.perf_counter()
     print(f"\nAnalyzing VEP file | ENCODE_ID: {ENCODE_ID}, TF_name: {TF_name}")
@@ -71,7 +72,7 @@ def process_vep(param, ENCODE_ID, TF_name, vep_seq):
     end = time.perf_counter()
     print(f"Analyzing VEP file finished in {round(end-start,3)} s | ENCODE_ID: {ENCODE_ID}, TF_name: {TF_name}")
 
-def pred_run(vep_processed_filepath="TF_binding_Effect_Prediction/TF_outputs/VEP_seq.csv"):
+def pred_run(vep_seq_file, p_val):
     global vep_seq
     if not os.path.exists("TF_binding_Effect_Prediction/TF_outputs/preds_eachTF"):  # the main output file
         os.makedirs("TF_binding_Effect_Prediction/TF_outputs/preds_eachTF")
@@ -88,7 +89,8 @@ def pred_run(vep_processed_filepath="TF_binding_Effect_Prediction/TF_outputs/VEP
 
     time_start = time.time()
     print("Prediction Starting!")
-    vep_seq = pd.read_csv(vep_processed_filepath)
+    # vep_seq = pd.read_csv(vep_seq_file)
+    vep_seq = vep_seq_file.copy()
     for param_file, param_data in param_dict.items():
         ENCODE_ID = param_file.split("_")[-2]
         TF_name = param_file.split("_")[-1].split(".")[0]
@@ -98,9 +100,15 @@ def pred_run(vep_processed_filepath="TF_binding_Effect_Prediction/TF_outputs/VEP
     print(f"\nPrediction Finished in {time_end-time_start}!")
     print("\nAnnotations are generating!")
 
-    p_vls = [0.05, 0.01, 0.001, 0.0001, 0.00001]
-    for x in p_vls:  # different thresholds of p-value
-        pred_files = glob.glob(f"TF_binding_Effect_Prediction/TF_outputs/preds_eachTF/pred_*.csv")
-        addcolumn_gain_loss(pred_files, x)  # x : alpha value for statistical significance
-        print(f"Predictions with annotations having {x} alpha threshold are completed!")
+    ## Instead of computing for all p-values, let's just compute for the one we want
+    # p_vls = [0.05, 0.01, 0.001, 0.0001, 0.00001]
+    # for x in p_vls:  # different thresholds of p-value
+    #     pred_files = glob.glob(f"TF_outputs/preds_eachTF/pred_*.csv")
+    #     addcolumn_gain_loss(pred_files, x)  # x : alpha value for statistical significance
+    #     print(f"Predictions with annotations having {x} alpha threshold are completed!")
+
+    pred_files = glob.glob(f"TF_binding_Effect_Prediction/TF_outputs/preds_eachTF/pred_*.csv")
+    tf_output_return = addcolumn_gain_loss(pred_files, p_val)  # x : alpha value for statistical significance
+    print(f"Predictions with annotations having {p_val} alpha threshold are completed!")
+    return tf_output_return
 

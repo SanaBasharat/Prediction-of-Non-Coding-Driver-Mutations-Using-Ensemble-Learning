@@ -28,9 +28,9 @@ def altered_seq(df): # fetching -30/+30 sequences from the center mutation point
         else: # unbalanced deletion # (NNNN/N) [1:]
             altered_sequence = dna_sequences[:(center+1)] + allele_alt[1:] + dna_sequences[(center + 1 + len(allele_ref[1:])):]
     return altered_sequence
-def vep_to_bed(vep_file):
+def vep_to_bed(vep_data):
     # VEP_raw data retrieved from Sana
-    vep_data = pd.read_csv(vep_file)
+    # vep_data = pd.read_csv(vep_file)
     vep_data.drop_duplicates(inplace=True) # duplications available
     vep_data = vep_data.reset_index(drop=True)
     vep_data["chr"] = "chr" + vep_data["chr"] # adding chr format for MEME tool
@@ -41,7 +41,7 @@ def vep_to_bed(vep_file):
     bed_format.columns = ["chr","start","end"]
     bed_format.to_csv("TF_binding_Effect_Prediction/TF_outputs/vep_to_bed.txt",header=False, index=False,sep="\t")
     return  bed_format
-def bed_to_seq(vep_file,bed_file,genome,id):
+def bed_to_seq(vep_data,bed_file,genome,id):
     ref_genome = pyfastx.Fasta(f"data/genome_assembly/{genome}.fa.gz")
     with open(bed_file, "r") as bed_data, open(f"TF_binding_Effect_Prediction/TF_outputs/{id}_fasta.txt", "w") as output_file: # bed to fasta format
         for line in bed_data:
@@ -58,16 +58,17 @@ def bed_to_seq(vep_file,bed_file,genome,id):
     locs = [y.split()[0].replace(">","").replace("(+)","") for x,y in enumerate(fasta) if x%2 == 0]
     seqs = [y.rstrip().upper().replace("N","") for x,y in enumerate(fasta) if x%2 != 0]
     vep_60seq = pd.DataFrame({"region": locs, "sequence": seqs})
-    vep_data = pd.read_csv(vep_file)
+    # vep_data = pd.read_csv(vep_file)
     vep_data["sequence"] = vep_60seq["sequence"]
     vep_data["altered_seq"] = vep_data.apply(altered_seq, axis=1)
     vep_data.to_csv("TF_binding_Effect_Prediction/TF_outputs/VEP_seq.csv", index=False)
     return vep_data
-def vep_to_seq(input_vep_filepath,genome_ref="hg19",id_name="vep_noncoding"):
+def vep_to_seq(data,genome_ref="hg19",id_name="vep_noncoding"):
     if not os.path.exists("TF_binding_Effect_Prediction/TF_outputs"):  # the main output file
         os.makedirs("TF_binding_Effect_Prediction/TF_outputs")
-    bed_format = vep_to_bed(input_vep_filepath)  # convert bed_file
+    bed_format = vep_to_bed(data)  # convert bed_file
     print("1- Bed file is created!")
-    vep_seq = bed_to_seq(input_vep_filepath,"TF_binding_Effect_Prediction/TF_outputs/vep_to_bed.txt",genome_ref,id_name) # convert seq-info file
+    vep_seq = bed_to_seq(data,"TF_binding_Effect_Prediction/TF_outputs/vep_to_bed.txt",genome_ref,id_name) # convert seq-info file
     print("3- VEP file with sequences is created!")
+    return vep_seq
 

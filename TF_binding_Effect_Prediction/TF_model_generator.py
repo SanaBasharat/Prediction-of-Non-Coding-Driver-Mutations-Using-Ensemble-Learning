@@ -146,18 +146,18 @@ def save_params(TF_trainset): # if user want to save pre-computed paramaters
     TF_name = TF_trainset.split("_")[3].split(".")[0]
     df_chip = read_chip(pbm_format,log2trans) # frequency table
     sgd_chip_none = apply_sgd(df_chip, minmax, "squared_error", None, ENCODE_ID)  # run model
-    with open(f"TF-binding Effect Prediction/TF_outputs/params/params_{ENCODE_ID}_{TF_name}.pkl", "wb") as file:
+    with open(f"TF_outputs/params/params_{ENCODE_ID}_{TF_name}.pkl", "wb") as file:
         pickle.dump(sgd_chip_none, file) # pre-computed coefficients/covariance matrix of features
-    print(f"TF-binding Effect Prediction/TF_outputs/{ENCODE_ID}_{TF_name} is trained and saved!")
+    print(f"TF_outputs/{ENCODE_ID}_{TF_name} is trained and saved!")
     param_dict[f"{ENCODE_ID}_{TF_name}"] = sgd_chip_none
 
 #-------------------------------------------------------------------------------------------------------------------
 
 # TF_outputs file is generated to store estimated paramaters and results
-if not os.path.exists("TF-binding Effect Prediction/TF_outputs"): # the main output file
-    os.makedirs("TF-binding Effect Prediction/TF_outputs")
-if not os.path.exists("TF-binding Effect Prediction/TF_outputs/params"): # for parameters of 6-mer model features
-    os.makedirs("TF-binding Effect Prediction/TF_outputs/params")
+if not os.path.exists("TF_binding_Effect_Prediction/TF_outputs"): # the main output file
+    os.makedirs("TF_binding_Effect_Prediction/TF_outputs")
+if not os.path.exists("TF_binding_Effect_Prediction/TF_outputs/params"): # for parameters of 6-mer model features
+    os.makedirs("TF_binding_Effect_Prediction/TF_outputs/params")
 
 # Combine all functions into one main workflow:
 trainset_file = "data/TF_trainsets/*.txt"

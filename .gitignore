@@ -56,3 +56,4 @@ TF_binding_Effect_Prediction/TF_outputs/TFcombined_results/vep_loss_gain_data_0.
 TF_binding_Effect_Prediction/TF_outputs/TFcombined_results/vep_loss_gain_data_0.01.csv
 TF_binding_Effect_Prediction/TF_outputs/TFcombined_results/vep_loss_gain_data_0.05.csv
 TF_binding_Effect_Prediction/TF_outputs/TFcombined_results/vep_loss_gain_data_1e-05.csv
+TF_binding_Effect_Prediction/TF_outputs/preds_eachTF/*
