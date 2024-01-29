@@ -1,5 +1,6 @@
 BASE_DIR: 'D:\Masters Thesis\GitHub Repo\'
 SCRIPTS_FOLDER: 'D:\Masters Thesis\GitHub Repo\scripts'
+LONG_RANGE_INTERACTIONS_RESULTS_FOLDER: 'D:\Masters Thesis\GitHub Repo\Long_Range_Interactions\Results'
 MODE: 'test'
 COLUMNS_TRAINING : ['ada_score', 'rf_score',
                     'ENSP', 'UNIPARC', 'GO',
