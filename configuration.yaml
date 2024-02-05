@@ -1,9 +1,8 @@
-BASE_DIR: 'D:\Sana\Prediction-of-Non-Coding-Driver-Mutations-Using-Ensemble-Learning\'
-SCRIPTS_FOLDER: 'D:\Sana\Prediction-of-Non-Coding-Driver-Mutations-Using-Ensemble-Learning\scripts'
+BASE_DIR: 'D:\Masters Thesis\GitHub Repo\'
+SCRIPTS_FOLDER: 'D:\Masters Thesis\GitHub Repo\scripts'
 MODE: 'test'
 COLUMNS_TRAINING : ['ada_score', 'rf_score',
-                    'ENSP', 'UNIPARC', 'GO',
-                    'LOEUF', 'SpliceAI_pred_DP_AG', 'SpliceAI_pred_DP_AL',
+                    'ENSP', 'UNIPARC', 'GO', 'SpliceAI_pred_DP_AG', 'SpliceAI_pred_DP_AL',
                     'SpliceAI_pred_DP_DG', 'SpliceAI_pred_DP_DL', 'SpliceAI_pred_DS_AG',
                     'SpliceAI_pred_DS_AL', 'SpliceAI_pred_DS_DG', 'SpliceAI_pred_DS_DL',
                     '3_prime_UTR_variant', '5_prime_UTR_variant',
@@ -19,14 +18,37 @@ COLUMNS_TRAINING : ['ada_score', 'rf_score',
                     'processed_pseudogene', 'processed_transcript', 'promoter',
                     'protein_coding', 'retained_intron',
                     'unprocessed_pseudogene',
-                    'CTCF_interactions', 'CTCF_chains', 'POLR2A_interactions', 'POLR2A_chains',
+                    'CTCF_interactions', 'POLR2A_interactions', 'CTCF_loops', 'POLR2A_loops',
                     'DNA', 'LINE', 'LTR', 'SINE', 'Simple_repeat',
                     'known_driver_gene', 'known_driver_gene_100kb_downstream', 'known_driver_gene_100kb_upstream', 'known_driver_gene_10kb_downstream',
                     'known_driver_gene_10kb_upstream', 'known_driver_gene_2kb_downstream', 'known_driver_gene_2kb_upstream',
                     'splice_acceptor_variant', 'splice_donor_region_variant', 'splice_donor_5th_base_variant',
                     'missense_variant', 'synonymous_variant', 'stop_gained', 'stop_lost', 'splice_region_variant', 'inframe_insertion', 'frameshift_variant',
-                    'TF_loss_add', 'TF_gain_add', 'TF_loss_diff_add', 'TF_gain_diff_add',
+                    'TF_loss', 'TF_gain', 'TF_loss_diff', 'TF_gain_diff',
                     'known_lncrna', 'known_lncrna_100kb_downstream', 'known_lncrna_100kb_upstream', 'known_lncrna_10kb_downstream',
                     'known_lncrna_10kb_upstream', 'known_lncrna_2kb_downstream', 'known_lncrna_2kb_upstream'
                   ]
+XGB_PARAMS : {                                            # CODE SOURCE: containers_build\boostdm\config.py
+        "objective": "binary:logistic",
+        "reg_lambda": 1,
+        "random_state": 42,
+        "scale_pos_weight": 1,
+        "subsample": 0.7,        # fraction of observations to be random samples for each tree
+        "reg_alpha": 0,          # L1 regularization term on weight
+        "max_delta_step": 0,    # positive value can help make the update step more conservative. generally not used
+        "min_child_weight": 1,
+        "learning_rate": 1e-03,
+        "colsample_bylevel": 1.0,
+        "gamma": 0,     # specifies the minimum loss reduction required to make a split. Makes the algorithm conservative
+        "colsample_bytree": 1.0,        # fraction of columns to be random samples for each tree
+        "booster": "gbtree",
+        "max_depth": 4, # Used to control over-fitting as higher depth will allow the model to learn relations very specific to a particular sample
+        "silent": 1,
+        "seed": 21,
+        "eval_metric": 'logloss',
+        "early_stopping_rounds": 2000
+        # "reg_lambda": 1,  # explore this further
+}
 WANDB_API_KEY: '####'
+# 'TF_loss_add', 'TF_gain_add', 'TF_loss_diff_add', 'TF_gain_diff_add',
+# , 'CTCF_intervals', 'POLR2A_intervals', 'CTCF_overlaps',  'POLR2A_overlaps',

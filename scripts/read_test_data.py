@@ -22,5 +22,4 @@ def read_test_data():
     test_data.drop_duplicates(subset=['chr', 'start', 'end', 'ref', 'alt'], inplace=True)
     test_data['chr'] = test_data['chr'].apply(lambda x: x.replace('chr', ''))
     test_data = test_data[['chr', 'start', 'end', 'ref', 'alt', 'driver', 'data_source']]
-    test_data['id'] = 'test' + test_data.index.astype(str)
     return test_data

@@ -61,3 +61,8 @@ TF_binding_Effect_Prediction/TF_outputs/TFcombined_results/vep_loss_gain_data_1e
 TF_binding_Effect_Prediction/TF_outputs/preds_eachTF/*
 data/TableS3_panorama_driver_mutations_ICGC_samples.controlled.csv
 data/TableS3_panorama_driver_mutations_TCGA_samples.controlled.csv
+data/VEP/vep_outout.csv
+data/VEP/vep_input.vcf
+data/feature_selected.csv
+data/splits.pkl
+data/VEP/vep_input.vcf
