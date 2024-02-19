@@ -24,7 +24,7 @@ COLUMNS_TRAINING : ['ada_score', 'rf_score',
                     'known_driver_gene_10kb_upstream', 'known_driver_gene_2kb_downstream', 'known_driver_gene_2kb_upstream',
                     'splice_acceptor_variant', 'splice_donor_region_variant', 'splice_donor_5th_base_variant',
                     'missense_variant', 'synonymous_variant', 'stop_gained', 'stop_lost', 'splice_region_variant', 'inframe_insertion', 'frameshift_variant',
-                    'TF_loss', 'TF_gain', 'TF_loss_diff', 'TF_gain_diff',
+                    'TF_loss', 'TF_gain', 'TF_loss_diff', 'TF_gain_diff', 'TF_loss_diff_add', 'TF_gain_diff_add', 'TF_gain_add', 'TF_loss_add',
                     'known_lncrna', 'known_lncrna_100kb_downstream', 'known_lncrna_100kb_upstream', 'known_lncrna_10kb_downstream',
                     'known_lncrna_10kb_upstream', 'known_lncrna_2kb_downstream', 'known_lncrna_2kb_upstream'
                   ]
@@ -49,6 +49,6 @@ XGB_PARAMS : {                                            # CODE SOURCE: contain
         "early_stopping_rounds": 2000
         # "reg_lambda": 1,  # explore this further
 }
-WANDB_API_KEY: '####'
+WANDB_API_KEY: '8760ac6e727d4e8b826bb6a5fd5bdf3e2d662a40'
 # 'TF_loss_add', 'TF_gain_add', 'TF_loss_diff_add', 'TF_gain_diff_add',
 # , 'CTCF_intervals', 'POLR2A_intervals', 'CTCF_overlaps',  'POLR2A_overlaps',

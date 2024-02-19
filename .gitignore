@@ -66,3 +66,4 @@ data/VEP/vep_input.vcf
 data/feature_selected.csv
 data/splits.pkl
 data/VEP/vep_input.vcf
+wandb/*
