@@ -67,3 +67,8 @@ data/feature_selected.csv
 data/splits.pkl
 data/VEP/vep_input.vcf
 wandb/*
+models.pkl
+models_dir/*
+eval_dir/*
+data/feature_selected_after_corr_feateng.csv
+data/feature_selected_after_corr.csv
